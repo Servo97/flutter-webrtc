@@ -675,6 +675,10 @@ FlutterRTCAudioRecorder* flutterRTCAudioRecorder;
                                       @"Error: peerConnection not found!"]
                 details:nil]);
     }
+  } else if ([@"startAudioSession" isEqualToString:call.method]) {
+    result(nil);
+  } else if ([@"stopAudioSession" isEqualToString:call.method]) {
+    result(nil);
   } else {
     result(FlutterMethodNotImplemented);
   }

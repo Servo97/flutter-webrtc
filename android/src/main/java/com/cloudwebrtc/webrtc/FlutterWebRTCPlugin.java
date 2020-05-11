@@ -160,6 +160,14 @@ public class FlutterWebRTCPlugin implements MethodCallHandler {
         });
     }
 
+    private void stopAudioManager(int mode) {
+        if (rtcAudioManager != null) {
+            Log.d(TAG, "Stoping the audio manager...");
+            rtcAudioManager.stop(mode);
+            rtcAudioManager = null;
+        }
+    }
+
     private void stopAudioManager() {
         if (rtcAudioManager != null) {
             Log.d(TAG, "Stoping the audio manager...");
@@ -389,6 +397,14 @@ public class FlutterWebRTCPlugin implements MethodCallHandler {
                 startAudioManager();
             }
             rtcAudioManager.setSpeakerphoneOn(enable);
+            result.success(null);
+        } else if (call.method.equals("startAudioSession")) {
+            if (rtcAudioManager == null) {
+                startAudioManager();
+            }
+            result.success(null);
+        } else if (call.method.equals("stopAudioSession")) {
+            stopAudioManager(AudioManager.MODE_NORMAL);
             result.success(null);
         } else if (call.method.equals("getDisplayMedia")) {
             Map<String, Object> constraints = call.argument("constraints");

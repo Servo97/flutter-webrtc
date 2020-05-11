@@ -289,6 +289,10 @@ public class RTCAudioManager {
 
   @SuppressWarnings("deprecation") // TODO(henrika): audioManager.abandonAudioFocus() is deprecated.
   public void stop() {
+    stop(savedAudioMode);
+  }
+
+  public void stop(int mode) {
     Log.d(TAG, "stop");
     ThreadUtils.checkIsOnMainThread();
     if (amState != AudioManagerState.RUNNING) {
@@ -304,7 +308,7 @@ public class RTCAudioManager {
     // Restore previously stored audio states.
     setSpeakerphoneOn(savedIsSpeakerPhoneOn);
     setMicrophoneMute(savedIsMicrophoneMute);
-    audioManager.setMode(savedAudioMode);
+    audioManager.setMode(mode);
 
     // Abandon audio focus. Gives the previous focus owner, if any, focus.
     audioManager.abandonAudioFocus(audioFocusChangeListener);
@@ -317,7 +321,7 @@ public class RTCAudioManager {
     }
 
     audioManagerEvents = null;
-    Log.d(TAG, "AudioManager stopped");
+    Log.d(TAG, "AudioManager stopped mode: " + audioManager.getMode());
   }
 
   /** Changes selection of the currently active audio device. */

@@ -12,6 +12,21 @@ class WebRTC {
   static bool get platformIsMobile => Platform.isIOS || Platform.isAndroid;
 
   static bool get platformIsWeb => false;
+
+  static startAudioSession() {
+    _channel.invokeMethod('startAudioSession');
+  }
+
+  static stopAudioSession() {
+    _channel.invokeMethod('stopAudioSession');
+  }
+
+  static enableSpeakerphone(bool enable) async {
+    await _channel.invokeMethod(
+      'enableSpeakerphone',
+      <String, dynamic>{'enable': enable},
+    );
+  }
 }
 
 Map<String, dynamic> defaultConstraints = {
