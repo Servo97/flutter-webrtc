@@ -124,18 +124,6 @@ public class FlutterWebRTCPlugin implements MethodCallHandler {
                 .setAudioDeviceModule(audioDeviceModule).createPeerConnectionFactory();
 
         rtcAudioManager = RTCAudioManager.create(registrar.context());
-        // Store existing audio settings and change audio mode to
-        // MODE_IN_COMMUNICATION for best possible VoIP performance.
-        Log.d(TAG, "Starting the audio manager...");
-        rtcAudioManager.start(new RTCAudioManager.AudioManagerEvents() {
-            // This method will be called each time the number of available audio
-            // devices has changed.
-            @Override
-            public void onAudioDeviceChanged(RTCAudioManager.AudioDevice audioDevice,
-                    Set<RTCAudioManager.AudioDevice> availableAudioDevices) {
-                onAudioManagerDevicesChanged(audioDevice, availableAudioDevices);
-            }
-        });
         /*
          * if (audioManager != null) { audioManager.stop(); audioManager = null; }
          */
@@ -190,8 +178,9 @@ public class FlutterWebRTCPlugin implements MethodCallHandler {
         if (call.method.equals("createPeerConnection")) {
             Map<String, Object> constraints = call.argument("constraints");
             Map<String, Object> configuration = call.argument("configuration");
+            Boolean startAudioSession = (Boolean) configuration.get("startAudioSession");
             String peerConnectionId = peerConnectionInit(new ConstraintsMap(configuration),
-                    new ConstraintsMap((constraints)));
+                    new ConstraintsMap((constraints)), startAudioSession);
             ConstraintsMap res = new ConstraintsMap();
             res.putString("peerConnectionId", peerConnectionId);
             result.success(res.toMap());
@@ -404,7 +393,7 @@ public class FlutterWebRTCPlugin implements MethodCallHandler {
             }
             result.success(null);
         } else if (call.method.equals("stopAudioSession")) {
-            stopAudioManager(AudioManager.MODE_NORMAL);
+            stopAudioManager();
             result.success(null);
         } else if (call.method.equals("getDisplayMedia")) {
             Map<String, Object> constraints = call.argument("constraints");
@@ -810,14 +799,14 @@ public class FlutterWebRTCPlugin implements MethodCallHandler {
         return conf;
     }
 
-    private String peerConnectionInit(ConstraintsMap configuration, ConstraintsMap constraints) {
+    private String peerConnectionInit(ConstraintsMap configuration, ConstraintsMap constraints, boolean startAudioSession) {
 
         String peerConnectionId = getNextStreamUUID();
         PeerConnectionObserver observer = new PeerConnectionObserver(this, peerConnectionId);
         PeerConnection peerConnection = mFactory.createPeerConnection(parseRTCConfiguration(configuration),
                 parseMediaConstraints(constraints), observer);
         observer.setPeerConnection(peerConnection);
-        if (mPeerConnectionObservers.size() == 0) {
+        if (mPeerConnectionObservers.size() == 0 && startAudioSession) {
             startAudioManager();
         }
         mPeerConnectionObservers.put(peerConnectionId, observer);

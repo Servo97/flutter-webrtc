@@ -409,9 +409,9 @@ public class RTCAudioManager {
   /** Sets the speaker phone mode. */
   public void setSpeakerphoneOn(boolean on) {
     boolean wasOn = audioManager.isSpeakerphoneOn();
-    if (wasOn == on) {
-      return;
-    }
+//    if (wasOn == on) {
+//      return;
+//    }
     audioManager.setSpeakerphoneOn(on);
   }
 
